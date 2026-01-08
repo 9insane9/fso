@@ -3,8 +3,10 @@ import personService from "./services/persons"
 import Form from "./Components/Form"
 import Filter from "./Components/Filter"
 import People from "./Components/People"
+import Message from "./Components/Message"
 
 const App = () => {
+  const [message, setMessage] = useState("")
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
@@ -44,6 +46,7 @@ const App = () => {
         .update(person.id, { name: newName, number: newNumber })
         .then((updatedP) => {
           setPersons(persons.map((p) => (p.id === updatedP.id ? updatedP : p)))
+          showMessage(`'${newName}' updated`)
           resetFields()
         })
       return
@@ -54,30 +57,46 @@ const App = () => {
       .create({ name: newName, number: newNumber })
       .then((newPerson) => {
         setPersons(persons.concat(newPerson))
+        showMessage(`'${newName}' added`)
         resetFields()
       })
   }
 
   const handleDelete = (id) => {
     const person = persons.find((p) => p.id === id)
-    const name = person.name
 
-    if (!window.confirm(`Delete ${name}?`)) {
-      return
-    }
+    if (!window.confirm(`Delete ${person.name}?`)) return
 
-    personService.remove(id)
-    setPersons(persons.filter((p) => p.id !== id))
+    personService
+      .remove(id)
+      .then(() => {
+        setPersons(persons.filter((p) => p.id !== id))
+        showMessage(`'${person.name}' deleted`)
+      })
+      .catch((err) => {
+        setPersons(persons.filter((p) => p.id !== id))
+        showMessage(`'${person.name}' was already removed from server`)
+        return
+      })
   }
 
+  //utils
   const resetFields = () => {
     setNewName("")
     setNewNumber("")
   }
 
+  const showMessage = (messageText) => {
+    setMessage(messageText)
+    setTimeout(() => {
+      setMessage("")
+    }, 5000)
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message text={message} />
       <Form
         newName={newName}
         newNumber={newNumber}
