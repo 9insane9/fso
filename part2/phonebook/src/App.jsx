@@ -35,15 +35,12 @@ const App = () => {
     if (persons.map((p) => p.name).includes(newName)) {
       const replacement = `${newName} already in phonebook, replace old number with new one?`
 
-      if (!window.confirm(replacement)) {
-        return
-      }
+      if (!window.confirm(replacement)) return
 
-      //find existing person
-      const person = persons.find((p) => p.name === newName)
+      const existingPerson = persons.find((p) => p.name === newName)
 
       personService
-        .update(person.id, { name: newName, number: newNumber })
+        .update(existingPerson.id, { name: newName, number: newNumber })
         .then((updatedP) => {
           setPersons(persons.map((p) => (p.id === updatedP.id ? updatedP : p)))
           showMessage(`'${newName}' updated`)
