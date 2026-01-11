@@ -2,6 +2,7 @@ const express = require("express")
 const randomId = require("./generateId")
 let persons = require("./persons")
 const morgan = require("morgan")
+const path = require("path")
 
 const app = express()
 app.use(express.json())
@@ -29,17 +30,16 @@ app.get("/api/persons/:id", (req, res) => {
 })
 
 ///POST
-
 app.post("/api/persons", (req, res) => {
   const alreadyExists = persons.find((p) => p.name === req.body.name)
   const nameOrNumberMissing = !req.body.name || !req.body.number
 
   if (alreadyExists) {
-    res.status(400).send({ error: "already exists in phonebook" })
+    return res.status(400).send({ error: "already exists in phonebook" })
   }
 
   if (nameOrNumberMissing) {
-    res.status(400).send({ error: "missing name or number" })
+    return res.status(400).send({ error: "missing name or number" })
   }
 
   const person = {
@@ -62,7 +62,7 @@ app.delete("/api/persons/:id", (req, res) => {
   }
 
   persons = persons.filter((p) => p.id !== id)
-  res.status(204)
+  res.status(204).end()
 })
 
 ///INFO
@@ -76,6 +76,6 @@ app.get("/info", (req, res) => {
 ///LISTEN
 const PORT = process.env.PORT || 3001
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
 })
