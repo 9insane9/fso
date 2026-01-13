@@ -1,77 +1,82 @@
+require("dotenv").config()
+
 const express = require("express")
-const randomId = require("./generateId")
-let persons = require("./persons")
-const morgan = require("morgan")
-const path = require("path")
+const Person = require("./models/person")
+const requestLogger = require("./utils/requestLogger")
+const errorHandler = require("./utils/errorHandler")
 
 const app = express()
 app.use(express.json())
 app.use(express.static("dist"))
-
-morgan.token("body", (req) => JSON.stringify(req.body))
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
-)
+app.use(requestLogger)
 
 ///GET
 app.get("/api/persons", (req, res) => {
-  res.send(persons)
+  Person.find({}).then((persons) => {
+    res.json(persons)
+  })
 })
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = req.params.id
-  const person = persons.find((p) => p.id === id)
-
-  if (!person) {
-    return res.status(404).send("Not found")
-  }
-
-  res.send(person)
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      person ? res.json(person) : res.status(404).end()
+    })
+    .catch((err) => next(err))
 })
 
 ///POST
 app.post("/api/persons", (req, res) => {
-  const alreadyExists = persons.find((p) => p.name === req.body.name)
-  const nameOrNumberMissing = !req.body.name || !req.body.number
-
-  if (alreadyExists) {
-    return res.status(400).send({ error: "already exists in phonebook" })
-  }
-
-  if (nameOrNumberMissing) {
-    return res.status(400).send({ error: "missing name or number" })
-  }
-
-  const person = {
-    id: randomId(),
+  const person = new Person({
     name: req.body.name,
     number: req.body.number,
-  }
+  })
 
-  persons = persons.concat(person)
+  person.save().then((savedPerson) => {
+    res.json(savedPerson)
+  })
+})
 
-  res.status(201).send(person)
+//UPDATE
+app.put("/api/persons/:id", (req, res) => {
+  const { name, number } = req.body
+
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (!person) {
+        return res.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person.save().then((updatedPerson) => {
+        res.json(updatedPerson)
+      })
+    })
+    .catch((err) => next(err))
 })
 
 ///DELETE
 app.delete("/api/persons/:id", (req, res) => {
-  const id = req.params.id
-
-  if (!persons.find((p) => p.id === id)) {
-    return res.status(404).send("Not found")
-  }
-
-  persons = persons.filter((p) => p.id !== id)
-  res.status(204).end()
+  Person.findByIdAndDelete(req.params.id)
+    .then(() => {
+      res.status(204).end()
+    })
+    .catch((err) => next(err))
 })
 
 ///INFO
 app.get("/info", (req, res) => {
-  const info = `Phonebook as info for ${persons.length} people \n \n
+  Person.find({}).then((persons) => {
+    const info = `Phonebook as info for ${persons.length} people <br><br>
   ${new Date()}`
 
-  res.send(info)
+    res.send(info)
+  })
 })
+
+app.use(errorHandler)
 
 ///LISTEN
 const PORT = process.env.PORT || 3001
