@@ -32,9 +32,12 @@ app.post("/api/persons", (req, res) => {
     number: req.body.number,
   })
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson)
-  })
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson)
+    })
+    .catch((err) => next(err))
 })
 
 //UPDATE
