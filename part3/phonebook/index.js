@@ -11,10 +11,12 @@ app.use(express.static("dist"))
 app.use(requestLogger)
 
 ///GET
-app.get("/api/persons", (req, res) => {
-  Person.find({}).then((persons) => {
-    res.json(persons)
-  })
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+    .then((persons) => {
+      res.json(persons)
+    })
+    .catch((err) => next(err))
 })
 
 app.get("/api/persons/:id", (req, res, next) => {
@@ -26,7 +28,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 })
 
 ///POST
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const person = new Person({
     name: req.body.name,
     number: req.body.number,
@@ -41,7 +43,7 @@ app.post("/api/persons", (req, res) => {
 })
 
 //UPDATE
-app.put("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
   const { name, number } = req.body
 
   Person.findById(req.params.id)
@@ -61,7 +63,7 @@ app.put("/api/persons/:id", (req, res) => {
 })
 
 ///DELETE
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(() => {
       res.status(204).end()
