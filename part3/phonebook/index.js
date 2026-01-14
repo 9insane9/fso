@@ -43,6 +43,8 @@ app.post("/api/persons", (req, res, next) => {
 })
 
 //UPDATE
+//note if we actually used the update functions here
+// validation would have to manually enabled
 app.put("/api/persons/:id", (req, res, next) => {
   const { name, number } = req.body
 
@@ -80,6 +82,8 @@ app.get("/info", (req, res) => {
     res.send(info)
   })
 })
+
+//**** 404 route handler here ****
 
 app.use(errorHandler)
 
