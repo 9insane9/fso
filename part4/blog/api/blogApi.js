@@ -3,18 +3,19 @@ const Blog = require("../models/blog")
 
 const apiRouter = express.Router()
 
-apiRouter.get("/blogs", (req, res) => {
-  Blog.find({}).then((blogs) => {
-    res.json(blogs)
-  })
+apiRouter.get("/blogs", async (req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
 })
 
-apiRouter.post("/blogs", (req, res) => {
-  const blog = new Blog(req.body)
+apiRouter.post("/blogs", async (req, res, next) => {
+  try {
+    const savedBlog = await new Blog(req.body).save()
 
-  blog.save().then((result) => {
-    res.status(201).json(result)
-  })
+    res.status(201).json(savedBlog)
+  } catch (err) {
+    next(err)
+  }
 })
 
 module.exports = apiRouter

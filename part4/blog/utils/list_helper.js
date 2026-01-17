@@ -9,16 +9,11 @@ const totalLikes = (blogs) => {
 const favoriteBlog = (blogs) => {
   if (blogs.length === 0) return null
 
-  let maxLikes
-  let indexOfHighest
+  //init
+  let maxLikes = blogs[0].likes
+  let indexOfHighest = 0
 
   for (let i = 0; i < blogs.length; i++) {
-    if (i === 0) {
-      //init
-      maxLikes = blogs[i].likes
-      indexOfHighest = i
-    }
-
     if (blogs[i].likes > maxLikes) {
       maxLikes = blogs[i]
       indexOfHighest = i
