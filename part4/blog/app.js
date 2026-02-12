@@ -1,17 +1,18 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const config = require("./utils/config")
-const apiRouter = require("./api/blogApi")
+const blogRouter = require("./api/blogApi")
+const usersRouter = require("./api/userApi")
+const loginRouter = require("./api/loginApi")
 const logger = require("./utils/logger")
 const {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 } = require("./utils/middleware")
 
 const app = express()
-
-// logger.info("connecting to", config.MONGODB_URL)
 
 mongoose
   .connect(config.MONGODB_URL, { family: 4 })
@@ -25,8 +26,11 @@ mongoose
 app.use(express.static("dist"))
 app.use(express.json())
 app.use(requestLogger)
+app.use(tokenExtractor)
 
-app.use("/api", apiRouter)
+app.use("/api/blogs", blogRouter)
+app.use("/api/users", usersRouter)
+app.use("/api/login", loginRouter)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
