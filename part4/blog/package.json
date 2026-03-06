@@ -6,7 +6,10 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development nodemon index.js",
-    "test": "NODE_ENV=test node --test --test-concurrency=1"
+    "test": "NODE_ENV=test node --test --test-concurrency=1",
+    "build:ui": "rm -rf dist && cd ../../part5/blog && npm run build && cp -r dist ../../part4/blog",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "start:test": "NODE_ENV=test nodemon index.js"
   },
   "author": "",
   "license": "ISC",

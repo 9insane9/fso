@@ -5,7 +5,7 @@ const { userExtractor } = require("../utils/middleware")
 
 const blogRouter = express.Router()
 
-// Get
+// GET
 blogRouter.get("/", async (req, res, next) => {
   try {
     const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 })
@@ -32,17 +32,15 @@ blogRouter.get("/:id", async (req, res, next) => {
   }
 })
 
-// Like a blog
+// LIKING A BLOG
 blogRouter.put("/:id", async (req, res, next) => {
   try {
-    const { likes } = req.body
-
     const blog = await Blog.findById(req.params.id)
     if (!blog) {
       return res.status(404).json({ error: "blog not found" })
     }
 
-    blog.likes = likes ?? 0
+    blog.likes = blog.likes + 1
     const updatedBlog = await blog.save()
     res.json(updatedBlog)
   } catch (err) {
@@ -50,7 +48,7 @@ blogRouter.put("/:id", async (req, res, next) => {
   }
 })
 
-// post
+// POST
 blogRouter.post("/", userExtractor, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
@@ -65,13 +63,18 @@ blogRouter.post("/", userExtractor, async (req, res, next) => {
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
 
-    res.status(201).json(savedBlog)
+    const populatedBlog = await savedBlog.populate("user", {
+      username: 1,
+      name: 1,
+    })
+
+    res.status(201).json(populatedBlog)
   } catch (err) {
     next(err)
   }
 })
 
-// Protected DELETE route
+// DELETE
 blogRouter.delete("/:id", userExtractor, async (req, res, next) => {
   try {
     const blog = await Blog.findById(req.params.id)

@@ -16,6 +16,7 @@ const bcrypt = require("bcrypt")
 describe("when there are some blogs saved", () => {
   let token
   let nonAuthorToken
+
   beforeEach(async () => {
     await Blog.deleteMany({})
     await User.deleteMany({})

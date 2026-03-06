@@ -46,6 +46,10 @@ const App = () => {
           showMessage(`'${newName}' updated`)
           resetFields()
         })
+        .catch((err) => {
+          console.error(err.response.data.error)
+          showMessage(err.response.data.error)
+        })
       return
     }
 
@@ -56,6 +60,10 @@ const App = () => {
         setPersons(persons.concat(newPerson))
         showMessage(`'${newName}' added`)
         resetFields()
+      })
+      .catch((err) => {
+        console.error(err.response.data.error)
+        showMessage(err.response.data.error)
       })
   }
 
@@ -70,7 +78,7 @@ const App = () => {
         setPersons(persons.filter((p) => p.id !== id))
         showMessage(`'${person.name}' deleted`)
       })
-      .catch((err) => {
+      .catch(() => {
         setPersons(persons.filter((p) => p.id !== id))
         showMessage(`'${person.name}' was already removed from server`)
         return
@@ -101,8 +109,15 @@ const App = () => {
         handleNumberChange={handleNumberChange}
         handleSubmit={handleSubmit}
       />
-      <Filter search={search} handleSearchChange={handleSearchChange} />
-      <People persons={persons} search={search} handleDelete={handleDelete} />
+      <Filter
+        search={search}
+        handleSearchChange={handleSearchChange}
+      />
+      <People
+        persons={persons}
+        search={search}
+        handleDelete={handleDelete}
+      />
     </div>
   )
 }

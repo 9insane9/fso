@@ -3,9 +3,9 @@ import { useState } from "react"
 const Blog = ({ blog, like, remove, username }) => {
   const [isVisible, setIsVisible] = useState(false)
 
-  // console.log(`blog was made by ${blog.user.username}`)
-  // console.log(`logged in user is ${username}`)
-  // console.log(blog)
+  console.log(`blog was made by ${blog.user.username}`)
+  console.log(`logged in user is ${username}`)
+  console.log(blog)
 
   const toggleShowMore = (e) => {
     e.preventDefault()
