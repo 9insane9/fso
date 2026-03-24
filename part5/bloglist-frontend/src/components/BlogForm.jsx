@@ -1,27 +1,42 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { useQueryClient, useMutation } from "@tanstack/react-query"
+import NotificationContext from "../context/NotificationContext"
+import { create } from "../services/blogs"
 
-const BlogForm = ({ createBlog, showMessage }) => {
+const BlogForm = () => {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
   const [isVisible, setIsVisible] = useState(false)
 
+  const { showNotification } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
+
+  const newBlogMutation = useMutation({
+    mutationFn: create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] })
+    },
+    onError: (e) => {
+      const errorMessage =
+        e.response?.data?.error || e.message || "Failed to post blog"
+
+      showNotification(errorMessage)
+    },
+  })
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    try {
-      await createBlog({ title, author, url })
+    const blog = { title, author, url }
+    setTitle("")
+    setAuthor("")
+    setUrl("")
+    setIsVisible(false)
 
-      setTitle("")
-      setAuthor("")
-      setUrl("")
-      setIsVisible(false)
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.error || err.message || "Failed to post blog"
-
-      showMessage(errorMessage)
-    }
+    newBlogMutation.mutate(blog)
+    const msg = `new blog titled "${blog.title}" created!`
+    showNotification(msg)
   }
 
   const handleShowForm = (e) => {

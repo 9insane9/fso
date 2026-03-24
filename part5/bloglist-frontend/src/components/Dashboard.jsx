@@ -1,4 +1,9 @@
-const Dashboard = ({ user, logOut }) => {
+import { useContext } from "react"
+import UserContext from "../context/UserContext"
+
+const Dashboard = () => {
+  const { user, logout } = useContext(UserContext)
+
   if (!user) {
     return <p>Not logged in</p>
   }
@@ -6,7 +11,7 @@ const Dashboard = ({ user, logOut }) => {
   return (
     <div>
       <p>logged in as {user.name}</p>
-      <button onClick={logOut}>logout</button>
+      <button onClick={logout}>logout</button>
     </div>
   )
 }

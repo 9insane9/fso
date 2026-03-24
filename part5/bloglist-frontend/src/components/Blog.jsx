@@ -1,27 +1,68 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { useQueryClient, useMutation } from "@tanstack/react-query"
+import { like, remove } from "../services/blogs"
+import NotificationContext from "../context/NotificationContext"
+import UserContext from "../context/UserContext"
 
-const Blog = ({ blog, like, remove, username }) => {
+const Blog = ({ blog }) => {
   const [isVisible, setIsVisible] = useState(false)
+  const { showNotification } = useContext(NotificationContext)
+  const { user } = useContext(UserContext)
+  const queryClient = useQueryClient()
+  const blogStyle = {
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+  }
 
-  console.log(`blog was made by ${blog.user.username}`)
-  console.log(`logged in user is ${username}`)
-  console.log(blog)
+  // console.log(`blog was made by ${blog.user.username}`)
+  // console.log(`logged in user is ${username}`)
+  // console.log(blog)
 
   const toggleShowMore = (e) => {
     e.preventDefault()
     setIsVisible((prev) => !prev)
   }
 
-  const handleDelete = (e) => {
+  const handleLike = async (e) => {
     e.preventDefault()
-    remove(blog.id)
+    await likeMutation.mutate(blog.id)
   }
 
-  const blogStyle = {
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
+  const handleDelete = async (e) => {
+    e.preventDefault()
+    if (window.confirm("delete this blog?")) {
+      await deleteMutation.mutate(blog.id)
+    }
   }
+
+  const likeMutation = useMutation({
+    mutationFn: like,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] })
+      showNotification("Blog liked")
+    },
+    onError: (e) => {
+      const errorMessage =
+        e.response?.data?.error || e.message || "Failed to like blog"
+
+      showNotification(errorMessage)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] })
+      showNotification("Blog removed")
+    },
+    onError: (e) => {
+      const errorMessage =
+        e.response?.data?.error || e.message || "Failed to remove blog"
+
+      showNotification(errorMessage)
+    },
+  })
 
   return (
     <div
@@ -39,7 +80,7 @@ const Blog = ({ blog, like, remove, username }) => {
         >
           {isVisible ? "hide" : "view"}
         </button>
-        {blog.user.username === username && (
+        {blog.user.username === user.username && (
           <button onClick={handleDelete}>delete</button>
         )}
         {isVisible && (
@@ -52,7 +93,7 @@ const Blog = ({ blog, like, remove, username }) => {
               <p>likes {blog.likes}</p>
               <button
                 aria-label="like"
-                onClick={() => like(blog.id)}
+                onClick={handleLike}
               >
                 like
               </button>
