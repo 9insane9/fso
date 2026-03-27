@@ -1,17 +1,20 @@
-import { useContext } from "react"
-import UserContext from "../context/UserContext"
+import { useUser } from "../hooks/useUser"
 
 const Dashboard = () => {
-  const { user, logout } = useContext(UserContext)
+  const { user, logout } = useUser()
 
   if (!user) {
-    return <p>Not logged in</p>
+    return (
+      <div>
+        <p>Not logged in</p>
+      </div>
+    )
   }
 
   return (
     <div>
-      <p>logged in as {user.name}</p>
-      <button onClick={logout}>logout</button>
+      <p>Logged in as {user.name}</p>
+      <button onClick={logout}>Log out</button>
     </div>
   )
 }

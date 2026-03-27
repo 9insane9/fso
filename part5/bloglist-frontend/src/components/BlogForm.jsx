@@ -1,21 +1,22 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { useQueryClient, useMutation } from "@tanstack/react-query"
-import NotificationContext from "../context/NotificationContext"
 import { create } from "../services/blogs"
+import { useNotification } from "../hooks/useNotification"
+import { useField } from "../hooks/useField"
 
 const BlogForm = () => {
-  const [title, setTitle] = useState("")
-  const [author, setAuthor] = useState("")
-  const [url, setUrl] = useState("")
-  const [isVisible, setIsVisible] = useState(false)
+  const title = useField("text")
+  const author = useField("text")
+  const url = useField("text")
 
-  const { showNotification } = useContext(NotificationContext)
+  const [isVisible, setIsVisible] = useState(false)
+  const { showNotification } = useNotification()
   const queryClient = useQueryClient()
 
   const newBlogMutation = useMutation({
     mutationFn: create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] })
+    onSuccess: (newBlog) => {
+      queryClient.setQueryData(["blogs"], (old) => old.concat(newBlog))
     },
     onError: (e) => {
       const errorMessage =
@@ -28,10 +29,15 @@ const BlogForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const blog = { title, author, url }
-    setTitle("")
-    setAuthor("")
-    setUrl("")
+    const blog = {
+      title: title.inputProps.value,
+      author: author.inputProps.value,
+      url: url.inputProps.value,
+    }
+
+    title.reset()
+    author.reset()
+    url.reset()
     setIsVisible(false)
 
     newBlogMutation.mutate(blog)
@@ -51,36 +57,27 @@ const BlogForm = () => {
           onClick={handleShowForm}
           aria-label="show-form"
         >
-          create new blog
+          Create new blog
         </button>
       ) : (
         <form onSubmit={handleSubmit}>
           <h2>create new</h2>
-          <label htmlFor="title">title</label>
+          <label htmlFor="title">Title: </label>
           <input
             id="title"
-            type="text"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...title.inputProps}
           />
-          <label htmlFor="author">author</label>
+          <label htmlFor="author">Author: </label>
           <input
             id="author"
-            type="text"
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
+            {...author.inputProps}
           />
-          <label htmlFor="url">url</label>
+          <label htmlFor="url">Link: </label>
           <input
             id="url"
-            type="text"
-            name="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            {...url.inputProps}
           />
-          <button type="submit">create</button>
+          <button type="submit">Create</button>
           <button
             type="button"
             onClick={handleShowForm}

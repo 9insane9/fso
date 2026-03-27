@@ -1,62 +1,34 @@
-import { useContext, useState } from "react"
-import UserContext from "../context/UserContext"
+import { useField } from "../hooks/useField"
+import { useUser } from "../hooks/useUser"
 
 const LoginForm = () => {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [isVisible, setIsVisible] = useState(false)
-  const { login } = useContext(UserContext)
-
-  const handleShowForm = (e) => {
-    e.preventDefault()
-    setIsVisible((prev) => !prev)
-  }
-
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value)
-  }
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value)
-  }
+  const username = useField("text")
+  const password = useField("password")
+  const { login } = useUser()
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    await login({ username, password })
-    setUsername("")
-    setPassword("")
+    await login({
+      username: username.inputProps.value,
+      password: password.inputProps.value,
+    })
   }
 
   return (
     <div>
-      {!isVisible ? (
-        <button onClick={handleShowForm}>Log in</button>
-      ) : (
-        <form onSubmit={handleLogin}>
-          <label htmlFor="username">username</label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            value={username}
-            onChange={handleUsernameChange}
-          />
-          <label htmlFor="password">password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-          />
-          <button type="submit">Login</button>
-          <button
-            type="button"
-            onClick={handleShowForm}
-          >
-            Cancel
-          </button>
-        </form>
-      )}
+      <form onSubmit={handleLogin}>
+        <label htmlFor="username">Username: </label>
+        <input
+          id="username"
+          {...username.inputProps}
+        />
+        <label htmlFor="password">Password: </label>
+        <input
+          id="password"
+          {...password.inputProps}
+        />
+        <button type="submit">Log in</button>
+      </form>
     </div>
   )
 }

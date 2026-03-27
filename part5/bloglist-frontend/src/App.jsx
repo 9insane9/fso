@@ -1,40 +1,33 @@
-import { useState, useEffect, useContext } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { getAll } from "./services/blogs"
-import Blog from "./components/Blog"
+import { Routes, Route, useMatch, useNavigate } from "react-router-dom"
+import ProtectedRoute from "./routes/ProtectedRoute"
+import PublicOnlyRoute from "./routes/PublicOnlyRoute"
+import BlogList from "./components/BlogList"
 import LoginForm from "./components/LoginForm"
 import Dashboard from "./components/Dashboard"
-import BlogForm from "./components/BlogForm"
 import Notification from "./components/Notification"
-import UserContext from "./context/UserContext"
 
 const App = () => {
-  const { user } = useContext(UserContext)
-  const { data: blogs = [] } = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getAll,
-    retry: 1,
-    select: (data) => [...data].sort((a, b) => b.likes - a.likes),
-  })
-
   return (
     <div>
-      <h2>blogs</h2>
+      <h2>SuperBadassBlog</h2>
 
       <Notification />
       <Dashboard />
 
-      {!user && <LoginForm />}
-
-      {user && <BlogForm />}
-
-      {user &&
-        blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
+      <Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={<BlogList />}
           />
-        ))}
+        </Route>
+        <Route element={<PublicOnlyRoute />}>
+          <Route
+            path="/login"
+            element={<LoginForm />}
+          />
+        </Route>
+      </Routes>
     </div>
   )
 }
