@@ -1,6 +1,7 @@
 const express = require("express")
 const Blog = require("../models/blog")
 const User = require("../models/user")
+const Comment = require("../models/comment")
 const { userExtractor } = require("../utils/middleware")
 
 const blogRouter = express.Router()
@@ -8,7 +9,10 @@ const blogRouter = express.Router()
 // GET
 blogRouter.get("/", async (req, res, next) => {
   try {
-    const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 })
+    const blogs = await Blog.find({})
+      .populate("user", { username: 1, name: 1 })
+      .populate("comments", { content: 1, author: 1 })
+
     res.json(blogs)
   } catch (err) {
     next(err)
@@ -27,6 +31,26 @@ blogRouter.get("/:id", async (req, res, next) => {
     }
 
     res.json(blog)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// COMMENTING ON A BLOG
+blogRouter.put("/:id/comments", async (req, res, next) => {
+  try {
+    const blog = await Blog.findById(req.params.id)
+    if (!blog) {
+      return res.status(404).json({ error: "blog not found" })
+    }
+
+    const comment = new Comment({ ...req.body })
+    const savedComment = await comment.save()
+
+    blog.comments = [...blog.comments, savedComment]
+    const updatedBlog = await blog.save()
+
+    res.json(updatedBlog)
   } catch (err) {
     next(err)
   }
