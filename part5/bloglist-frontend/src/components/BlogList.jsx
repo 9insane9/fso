@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getAll } from "../services/blogs"
-import Blog from "./Blog"
 import BlogForm from "./BlogForm"
+import { Link } from "react-router-dom"
 
 const BlogList = () => {
   const { data: blogs = [] } = useQuery({
@@ -14,12 +14,13 @@ const BlogList = () => {
   return (
     <div>
       <BlogForm />
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-        />
-      ))}
+      <ul>
+        {blogs.map((blog) => (
+          <li key={blog.id}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

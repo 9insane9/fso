@@ -2,7 +2,12 @@ import { Navigate, Outlet } from "react-router-dom"
 import { useUser } from "../hooks/useUser"
 
 const ProtectedRoute = () => {
-  const { user } = useUser()
+  const { user, loading } = useUser()
+  console.log("ProtectedRoute user:", user)
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   if (!user)
     return (

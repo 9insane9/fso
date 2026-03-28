@@ -20,7 +20,12 @@ export const create = async (newBlog) => {
   const response = await axios.post(baseUrl, newBlog, config)
   return response.data
 }
-
+///
+export const addComment = async (id, comment) => {
+  const response = await axios.put(`${baseUrl}/${id}/comments`, comment)
+  return response.data
+}
+///
 export const like = async (id) => {
   const response = await axios.put(`${baseUrl}/${id}`)
   return response.data

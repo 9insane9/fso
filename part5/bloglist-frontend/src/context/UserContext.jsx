@@ -1,4 +1,10 @@
-import { createContext, useReducer, useEffect, useContext } from "react"
+import {
+  createContext,
+  useReducer,
+  useEffect,
+  useContext,
+  useState,
+} from "react"
 import { setToken } from "../services/blogs"
 import { login } from "../services/login"
 import NotificationContext from "./NotificationContext"
@@ -18,6 +24,8 @@ const userReducer = (state, action) => {
 
 export const UserContextProvider = ({ children }) => {
   const [user, dispatch] = useReducer(userReducer, null)
+  const [loading, setLoading] = useState(true)
+
   const { showNotification } = useContext(NotificationContext)
 
   //check if already logged in
@@ -28,6 +36,7 @@ export const UserContextProvider = ({ children }) => {
       dispatch({ type: "LOGIN", payload: user })
       setToken(user.token)
     }
+    setLoading(false)
   }, [])
 
   const loginUser = async (credentials) => {
@@ -58,7 +67,7 @@ export const UserContextProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, login: loginUser, logout: logoutUser }}
+      value={{ user, login: loginUser, logout: logoutUser, loading }}
     >
       {children}
     </UserContext.Provider>

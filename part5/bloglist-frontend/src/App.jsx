@@ -2,8 +2,11 @@ import { Routes, Route, useMatch, useNavigate } from "react-router-dom"
 import ProtectedRoute from "./routes/ProtectedRoute"
 import PublicOnlyRoute from "./routes/PublicOnlyRoute"
 import BlogList from "./components/BlogList"
+import Blog from "./components/Blog"
 import LoginForm from "./components/LoginForm"
 import Dashboard from "./components/Dashboard"
+import Users from "./components/Users"
+import User from "./components/User"
 import Notification from "./components/Notification"
 
 const App = () => {
@@ -19,6 +22,18 @@ const App = () => {
           <Route
             path="/"
             element={<BlogList />}
+          />
+          <Route
+            path="/blogs/:id"
+            element={<Blog />}
+          />
+          <Route
+            path="/users"
+            element={<Users />}
+          />
+          <Route
+            path="/users/:username"
+            element={<User />}
           />
         </Route>
         <Route element={<PublicOnlyRoute />}>

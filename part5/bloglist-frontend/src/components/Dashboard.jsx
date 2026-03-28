@@ -1,4 +1,5 @@
 import { useUser } from "../hooks/useUser"
+import { Link } from "react-router-dom"
 
 const Dashboard = () => {
   const { user, logout } = useUser()
@@ -13,8 +14,14 @@ const Dashboard = () => {
 
   return (
     <div>
-      <p>Logged in as {user.name}</p>
-      <button onClick={logout}>Log out</button>
+      <nav>
+        <Link to="/users">Users</Link>
+        <Link to="/">Blogs</Link>
+      </nav>
+      <div className="userPanel">
+        <p>Logged in as {user.name}</p>
+        <button onClick={logout}>Log out</button>
+      </div>
     </div>
   )
 }

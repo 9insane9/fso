@@ -1,30 +1,20 @@
-import { useQueryClient, useMutation } from "@tanstack/react-query"
-import { like, remove } from "../services/blogs"
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
+import { useParams } from "react-router-dom"
+import { like, remove, getAll } from "../services/blogs"
 import { useNotification } from "../hooks/useNotification"
+import Comments from "./Comments"
 import { useUser } from "../hooks/useUser"
 
-const Blog = ({ blog }) => {
+const Blog = () => {
   const { showNotification } = useNotification()
   const { user } = useUser()
+  const { id } = useParams()
   const queryClient = useQueryClient()
 
-  const blogStyle = {
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
-  const handleLike = async (e) => {
-    e.preventDefault()
-    await likeMutation.mutate(blog.id)
-  }
-
-  const handleDelete = async (e) => {
-    e.preventDefault()
-    if (window.confirm("delete this blog?")) {
-      await deleteMutation.mutate(blog.id)
-    }
-  }
+  const { data: blogs, isLoading } = useQuery({
+    queryKey: ["blogs"],
+    queryFn: getAll,
+  })
 
   const likeMutation = useMutation({
     mutationFn: like,
@@ -33,10 +23,8 @@ const Blog = ({ blog }) => {
       showNotification("Blog liked")
     },
     onError: (e) => {
-      const errorMessage =
-        e.response?.data?.error || e.message || "Failed to like blog"
-
-      showNotification(errorMessage)
+      const msg = e.response?.data?.error || e.message || "Failed to like blog"
+      showNotification(msg)
     },
   })
 
@@ -47,23 +35,41 @@ const Blog = ({ blog }) => {
       showNotification("Blog removed")
     },
     onError: (e) => {
-      const errorMessage =
+      const msg =
         e.response?.data?.error || e.message || "Failed to remove blog"
-
-      showNotification(errorMessage)
+      showNotification(msg)
     },
   })
 
+  const handleLike = (e) => {
+    e.preventDefault()
+    likeMutation.mutate(blog.id)
+  }
+
+  const handleDelete = (e) => {
+    e.preventDefault()
+    if (window.confirm("Delete this blog?")) {
+      deleteMutation.mutate(blog.id)
+    }
+  }
+
+  if (isLoading) return <div>Loading...</div>
+
+  const blog = blogs.find((b) => b.id === id)
+  if (!blog) return <div>Blog not found</div>
+
   return (
     <div
-      style={blogStyle}
       className="blogContainer"
       data-testid="blog-container"
     >
-      <div>
-        <p>
-          {blog.title} by {blog.author}
-        </p>
+      <div className="blogData">
+        <a
+          className="blogUrl"
+          href={blog.url}
+        >
+          {blog.title}
+        </a>
         {blog.user.username === user.username && (
           <button onClick={handleDelete}>delete</button>
         )}
@@ -71,7 +77,6 @@ const Blog = ({ blog }) => {
           className="extraInfo"
           data-testid="extra-info"
         >
-          <p className="blogUrl">{blog.url}</p>
           <div className="blogLikes">
             <p>likes {blog.likes}</p>
             <button
@@ -81,8 +86,13 @@ const Blog = ({ blog }) => {
               like
             </button>
           </div>
+          <p>Added by {blog.user.name}</p>
         </div>
       </div>
+      <Comments
+        id={id}
+        comments={blog.comments}
+      />
     </div>
   )
 }
