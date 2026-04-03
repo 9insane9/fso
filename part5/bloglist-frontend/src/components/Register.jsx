@@ -1,39 +1,46 @@
 import { useField } from "../hooks/useField"
-import { useUser } from "../hooks/useUser"
 import { Link } from "react-router-dom"
+import { useUser } from "../hooks/useUser"
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const username = useField("text")
+  const name = useField("text")
   const password = useField("password")
-  const { login } = useUser()
+  const { register } = useUser()
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault()
-    await login({
+    await register({
       username: username.value,
+      name: name.value,
       password: password.value,
     })
   }
 
   return (
     <div>
-      <form onSubmit={handleLogin}>
-        <h2>Log in</h2>
+      <form onSubmit={handleRegister}>
+        <h2>Sign up</h2>
         <label htmlFor="username">Username: </label>
         <input
           id="username"
           {...username.inputProps}
+        />
+        <label htmlFor="name">Name: </label>
+        <input
+          id="name"
+          {...name.inputProps}
         />
         <label htmlFor="password">Password: </label>
         <input
           id="password"
           {...password.inputProps}
         />
-        <button type="submit">Log in</button>
-        <Link to="/register">Don't have an account? Sign up here</Link>
+        <button type="submit">Register</button>
+        <Link to="/login">Already have an account? Log in here</Link>
       </form>
     </div>
   )
 }
 
-export default LoginForm
+export default RegisterForm

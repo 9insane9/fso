@@ -8,6 +8,7 @@ import Dashboard from "./components/Dashboard"
 import Users from "./components/Users"
 import User from "./components/User"
 import Notification from "./components/Notification"
+import RegisterForm from "./components/Register"
 
 const App = () => {
   return (
@@ -40,6 +41,10 @@ const App = () => {
           <Route
             path="/login"
             element={<LoginForm />}
+          />
+          <Route
+            path="/register"
+            element={<RegisterForm />}
           />
         </Route>
       </Routes>

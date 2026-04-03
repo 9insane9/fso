@@ -7,7 +7,9 @@ import {
 } from "react"
 import { setToken } from "../services/blogs"
 import { login } from "../services/login"
+import { register } from "../services/users"
 import NotificationContext from "./NotificationContext"
+import { useNavigate } from "react-router-dom"
 
 const UserContext = createContext()
 
@@ -25,7 +27,7 @@ const userReducer = (state, action) => {
 export const UserContextProvider = ({ children }) => {
   const [user, dispatch] = useReducer(userReducer, null)
   const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate()
   const { showNotification } = useContext(NotificationContext)
 
   //check if already logged in
@@ -46,11 +48,12 @@ export const UserContextProvider = ({ children }) => {
       setToken(userData.token)
       dispatch({ type: "LOGIN", payload: userData })
 
-      const msg = "successfully logged in"
+      const msg = "Successfully logged in. "
       showNotification(msg)
       return { success: true }
     } catch (error) {
-      const msg = error.response?.data?.error || error.message || "Login failed"
+      const msg =
+        error.response?.data?.error || error.message || "Login failed. "
       showNotification(msg)
       return { success: false }
     }
@@ -61,13 +64,36 @@ export const UserContextProvider = ({ children }) => {
     dispatch({ type: "LOGOUT" })
     setToken(null)
 
-    const msg = "successfully logged out"
+    const msg = "Successfully logged out. "
     showNotification(msg)
+  }
+
+  const registerUser = async (user) => {
+    try {
+      await register(user)
+
+      const msg = "Successfully registered. "
+      showNotification(msg)
+
+      navigate("/")
+
+      return { success: true }
+    } catch (error) {
+      const msg =
+        error.response?.data?.error || error.message || "Failed to register. "
+      showNotification(msg)
+    }
   }
 
   return (
     <UserContext.Provider
-      value={{ user, login: loginUser, logout: logoutUser, loading }}
+      value={{
+        user,
+        login: loginUser,
+        logout: logoutUser,
+        register: registerUser,
+        loading,
+      }}
     >
       {children}
     </UserContext.Provider>
