@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useQueryClient, useMutation } from "@tanstack/react-query"
 import { create } from "../services/blogs"
-import { useNotification } from "../hooks/useNotification"
+// import { useNotification } from "../hooks/useNotification"
+import { toast } from "react-toastify"
 import { useField } from "../hooks/useField"
 
 const BlogForm = () => {
@@ -10,19 +11,23 @@ const BlogForm = () => {
   const url = useField("text")
 
   const [isVisible, setIsVisible] = useState(false)
-  const { showNotification } = useNotification()
+  // const { showNotification } = useNotification()
   const queryClient = useQueryClient()
 
   const newBlogMutation = useMutation({
     mutationFn: create,
     onSuccess: (newBlog) => {
       queryClient.setQueryData(["blogs"], (old) => old.concat(newBlog))
+      const msg = "Blog created!"
+      // showNotification(msg)
+      toast.success(msg)
     },
     onError: (e) => {
       const errorMessage =
         e.response?.data?.error || e.message || "Failed to post blog"
 
-      showNotification(errorMessage)
+      // showNotification(errorMessage)
+      toast.error(errorMessage)
     },
   })
 
@@ -41,8 +46,6 @@ const BlogForm = () => {
     setIsVisible(false)
 
     newBlogMutation.mutate(blog)
-    const msg = `new blog titled "${blog.title}" created!`
-    showNotification(msg)
   }
 
   const handleShowForm = (e) => {

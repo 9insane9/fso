@@ -1,12 +1,13 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 import { like, remove, getAll } from "../services/blogs"
-import { useNotification } from "../hooks/useNotification"
+// import { useNotification } from "../hooks/useNotification"
+import { toast } from "react-toastify"
 import Comments from "./Comments"
 import { useUser } from "../hooks/useUser"
 
 const Blog = () => {
-  const { showNotification } = useNotification()
+  // const { showNotification } = useNotification()
   const { user } = useUser()
   const { id } = useParams()
   const queryClient = useQueryClient()
@@ -20,11 +21,13 @@ const Blog = () => {
     mutationFn: like,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] })
-      showNotification("Blog liked")
+      // showNotification("Blog liked")
+      toast.success("Blog liked")
     },
     onError: (e) => {
       const msg = e.response?.data?.error || e.message || "Failed to like blog"
-      showNotification(msg)
+      // showNotification(msg)
+      toast.error(msg)
     },
   })
 
@@ -32,12 +35,14 @@ const Blog = () => {
     mutationFn: remove,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] })
-      showNotification("Blog removed")
+      // showNotification("Blog removed")
+      toast.success("Blog removed")
     },
     onError: (e) => {
       const msg =
         e.response?.data?.error || e.message || "Failed to remove blog"
-      showNotification(msg)
+      // showNotification(msg)
+      toast.error(msg)
     },
   })
 

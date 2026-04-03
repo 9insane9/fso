@@ -9,15 +9,19 @@ import Users from "./components/Users"
 import User from "./components/User"
 import Notification from "./components/Notification"
 import RegisterForm from "./components/Register"
+import { ToastContainer } from "react-toastify"
 
 const App = () => {
   return (
     <div>
       <h2>SuperBadassBlog</h2>
-
-      <Notification />
+      {/* <Notification /> */}
+      <ToastContainer
+        autoClose={3000}
+        hideProgressBar={true}
+        theme="dark"
+      />
       <Dashboard />
-
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route

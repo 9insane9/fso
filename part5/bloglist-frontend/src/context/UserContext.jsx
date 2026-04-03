@@ -8,7 +8,8 @@ import {
 import { setToken } from "../services/blogs"
 import { login } from "../services/login"
 import { register } from "../services/users"
-import NotificationContext from "./NotificationContext"
+// import NotificationContext from "./NotificationContext"
+import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 
 const UserContext = createContext()
@@ -28,7 +29,7 @@ export const UserContextProvider = ({ children }) => {
   const [user, dispatch] = useReducer(userReducer, null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-  const { showNotification } = useContext(NotificationContext)
+  // const { showNotification } = useContext(NotificationContext)
 
   //check if already logged in
   useEffect(() => {
@@ -49,12 +50,15 @@ export const UserContextProvider = ({ children }) => {
       dispatch({ type: "LOGIN", payload: userData })
 
       const msg = "Successfully logged in. "
-      showNotification(msg)
+      // showNotification(msg)
+      toast.success(msg)
+
       return { success: true }
     } catch (error) {
       const msg =
         error.response?.data?.error || error.message || "Login failed. "
-      showNotification(msg)
+      // showNotification(msg)
+      toast.error(msg)
       return { success: false }
     }
   }
@@ -65,7 +69,8 @@ export const UserContextProvider = ({ children }) => {
     setToken(null)
 
     const msg = "Successfully logged out. "
-    showNotification(msg)
+    // showNotification(msg)
+    toast.success(msg)
   }
 
   const registerUser = async (user) => {
@@ -73,7 +78,8 @@ export const UserContextProvider = ({ children }) => {
       await register(user)
 
       const msg = "Successfully registered. "
-      showNotification(msg)
+      // showNotification(msg)
+      toast.success(msg)
 
       navigate("/")
 
@@ -81,7 +87,8 @@ export const UserContextProvider = ({ children }) => {
     } catch (error) {
       const msg =
         error.response?.data?.error || error.message || "Failed to register. "
-      showNotification(msg)
+      // showNotification(msg)
+      toast.error(msg)
     }
   }
 
