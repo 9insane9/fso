@@ -1,7 +1,11 @@
 const bcrypt = require("bcrypt")
 const usersRouter = require("express").Router()
 const User = require("../models/user")
-const { validateUsername, validatePassword } = require("../utils/validators")
+const {
+  validateUsername,
+  validatePassword,
+  validateName,
+} = require("../utils/validators")
 
 usersRouter.get("/", async (req, res, next) => {
   try {
@@ -20,6 +24,7 @@ usersRouter.get("/", async (req, res, next) => {
 usersRouter.post(
   "/",
   validateUsername,
+  validateName,
   validatePassword,
   async (req, res, next) => {
     try {
