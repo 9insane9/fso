@@ -64,7 +64,7 @@ const BlogForm = () => {
         </button>
       ) : (
         <form onSubmit={handleSubmit}>
-          <h2>create new</h2>
+          <h2>Post new blog</h2>
           <label htmlFor="title">Title: </label>
           <input
             id="title"
@@ -85,7 +85,7 @@ const BlogForm = () => {
             type="button"
             onClick={handleShowForm}
           >
-            cancel
+            Cancel
           </button>
         </form>
       )}
